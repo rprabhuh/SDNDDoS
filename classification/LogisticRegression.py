@@ -1,4 +1,4 @@
-from pyspark.mllib.classification import SVMWithSGD
+from pyspark.mllib.classification import LogisticRegressionWithSGD
 from pyspark.mllib.regression import LabeledPoint
 from numpy import array
 from pyspark import SparkContext, SparkConf
@@ -30,7 +30,7 @@ data = sc.textFile("dataset.dat")
 parsedData = data.map(parsePoint)
 
 # Build the classification model
-model = SVMWithSGD.train(parsedData)
+model = LogisticRegressionWithSGD.train(parsedData)
 
 # Evaluating the model on training data
 labelsAndPreds = parsedData.map(lambda p: (p.label, model.predict(p.features)))

@@ -1,4 +1,4 @@
-from pyspark.mllib.classification import SVMWithSGD
+from pyspark.mllib.tree import DecisionTree
 from pyspark.mllib.regression import LabeledPoint
 from numpy import array
 from pyspark import SparkContext, SparkConf
@@ -29,11 +29,19 @@ data = sc.textFile("dataset.dat")
 # Parse the data to construct a classification dataset
 parsedData = data.map(parsePoint)
 
-# Build the classification model
-model = SVMWithSGD.train(parsedData)
 
+# Build the classification model
+'''
+impurity can be any of {gini, entropy, variance}
+categoricalFeaturesInfo contains information pertaining to categorical features in the dataset
+'''
+model = DecisionTree.trainClassifier(parsedData, numClasses=2, categoricalFeaturesInfo={},
+                                     impurity='gini', maxDepth=5, maxBins=100)
 # Evaluating the model on training data
-labelsAndPreds = parsedData.map(lambda p: (p.label, model.predict(p.features)))
-trainErr = labelsAndPreds.filter(lambda (v, p): v != p).count() / float(parsedData.count())
-print("Training Error = " + str(trainErr))
+
+predictions = model.predict(parsedData.map(lambda x: x.features))
+labelsAndPredictions = parsedData.map(lambda lp: lp.label).zip(predictions)
+trainMSE = labelsAndPredictions.map(lambda (v, p): (v - p) * (v - p)).sum() / float(parsedData.count())
+print('Training Mean Squared Error = ' + str(trainMSE))
+print('Learned regression tree model:')
 print(model)

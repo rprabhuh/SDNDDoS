@@ -2,6 +2,7 @@ from pyspark.mllib.tree import DecisionTree
 from pyspark.mllib.regression import LabeledPoint
 from numpy import array
 from pyspark import SparkContext, SparkConf
+import sys
 
 appName = "KDDDataset"
 
@@ -23,9 +24,13 @@ def parsePoint(line):
     values = [float(x) for x in line.split(',')]
     return LabeledPoint(values[0], values[1:])
 
+#Check if the dataset has been passed as an argument
+if(len(sys.argv)==1):
+	print("Please pass the filename of the dataset as a commandline argument")
+	exit(0);
 
 # Read the input data file
-data = sc.textFile("dataset.dat")
+data = sc.textFile("../Data/"+sys.argv[1])
 
 # Parse the data to construct a classification dataset
 parsedData = data.map(parsePoint)
@@ -37,13 +42,13 @@ parsedData = data.map(parsePoint)
 impurity can be any of {gini, entropy, variance}
 categoricalFeaturesInfo contains information pertaining to categorical features in the dataset
 '''
-model = DecisionTree.trainClassifier(parsedData, numClasses=2, categoricalFeaturesInfo={1:3,2:11,3:5},
-                                     impurity='gini', maxDepth=10, maxBins=50000)
+model = DecisionTree.trainClassifier(parsedData, numClasses=2, categoricalFeaturesInfo={0:3},
+                                     impurity='gini', maxDepth=30, maxBins=100)
 # Evaluating the model on training data
-
-predictions = model.predict(parsedData.map(lambda x: x.features))
-labelsAndPredictions = parsedData.map(lambda lp: lp.label).zip(predictions)
-trainMSE = labelsAndPredictions.map(lambda (v, p): (v - p) * (v - p)).sum() / float(parsedData.count())
-print('Training Mean Squared Error = ' + str(trainMSE))
-print('Learned regression tree model:')
+#sys.stdout.write(model)
+#predictions = model.predict(parsedData.map(lambda x: x.features))
+#labelsAndPredictions = parsedData.map(lambda lp: lp.label).zip(predictions)
+#trainMSE = labelsAndPredictions.map(lambda (v, p): (v - p) * (v - p)).sum() / float(parsedData.count())
+#print('Training Mean Squared Error = ' + str(trainMSE))
+#print('Learned regression tree model:')
 print(model)

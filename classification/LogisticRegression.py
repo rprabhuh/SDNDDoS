@@ -2,6 +2,7 @@ from pyspark.mllib.classification import LogisticRegressionWithSGD
 from pyspark.mllib.regression import LabeledPoint
 from numpy import array
 from pyspark import SparkContext, SparkConf
+import sys
 
 appName = "KDDDataset"
 
@@ -23,8 +24,13 @@ def parsePoint(line):
     values = [float(x) for x in line.split(',')]
     return LabeledPoint(values[0], values[1:])
 
+#Check if the dataset has been passed as an argument
+if(len(sys.argv)==1):
+	print("Please pass the filename of the dataset as a commandline argument")
+	exit(0);
+
 # Read the input data file
-data = sc.textFile("dataset.dat")
+data = sc.textFile("../Data/"+sys.argv[1])
 
 # Parse the data to construct a classification dataset
 parsedData = data.map(parsePoint)

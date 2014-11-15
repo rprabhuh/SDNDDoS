@@ -44,11 +44,26 @@ categoricalFeaturesInfo contains information pertaining to categorical features 
 '''
 model = DecisionTree.trainClassifier(parsedData, numClasses=2, categoricalFeaturesInfo={0:3},
                                      impurity='gini', maxDepth=30, maxBins=100)
+
+# PRINT THE MODEL
+#print('Learned decision tree model:')
+#print(model.toDebugString())
+
 # Evaluating the model on training data
 #sys.stdout.write(model)
-#predictions = model.predict(parsedData.map(lambda x: x.features))
-#labelsAndPredictions = parsedData.map(lambda lp: lp.label).zip(predictions)
-#trainMSE = labelsAndPredictions.map(lambda (v, p): (v - p) * (v - p)).sum() / float(parsedData.count())
-#print('Training Mean Squared Error = ' + str(trainMSE))
-#print('Learned regression tree model:')
-print(model)
+
+# Working: Predict with a single input
+#predictions = model.predict(array([2,1032,0,0,0,0,0,0,0,0,0,255,255,1,0,1,0,0,0]))
+
+# BATCH PREDICTION
+predictions = model.predict(parsedData.map(lambda x: x.features))
+labelsAndPredictions = parsedData.map(lambda lp: lp.label).zip(predictions)
+
+# Dsiplay Training Mean Squared Error
+trainMSE = labelsAndPredictions.map(lambda (v, p): (v - p) * (v - p)).sum() / float(parsedData.count())
+print('Training Mean Squared Error = ' + str(trainMSE))
+
+# Dsiplay Training Error
+trainErr = labelsAndPredictions.filter(lambda (v, p): v != p).count() / float(parsedData.count())
+print('Training Error = ' + str(trainErr))
+

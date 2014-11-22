@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<!-- your webpage info goes here -->
+
+    <title>SDN Analytics to Counter DDoS Attacks</title>
+	
+	<meta name="author" content="your name" />
+	<meta name="description" content="" />
+
+<!-- you should always add your stylesheet (css) in the head tag so that it starts loading before the page html is being displayed -->	
+	<link rel="stylesheet" href="style.css" type="text/css" />
+	
+</head>
+<body>
+	<script src="plot.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+	<script src="/pico/client.js"></script>
+    <script>pico.load("plotscript");</script>
+<!-- webpage content goes here in the body -->
+
+	<div id="page">
+		<div id="logo">
+			<h1><a href="/">SDN Analytics to Counter DDoS Attacks</a></h1>
+		</div>
+		<div id="nav">
+			<ul>
+				<li class="red"><a href="#/home.html">Home</a></li>
+				<li class="orange"><a href="#/about.html">About</a></li>
+				<li class="yellow"><a href="#/contact.html">Contact</a></li>
+			</ul>	
+		</div>
+		<div id="content">
+			<h2>Abstract</h2>
+			<p>
+			DDoS (Distributed Denial of Service) is becoming a major security threat on the Internet, and real-time DDoS detection and mitigation can be a challenging task. We propose a real-time DDoS packet classification system in the SDN (Software Defined Network) context to address the problem with a learning-based approach using Apache Spark
+			computation engine.We define the features of DDoS flows and provide a real-time response learning approach which is alternative to existing packet filtering based systems.
+			</p>
+		</div>
+		<div id="content">
+			<h2>Monitor</h2>
+			<canvas width="1000" height="400" id="canv"></canvas>
+		</div>
+		<div id="footer">
+			<p>
+				Webpage made by <a href="/" target="_blank">Cloud 9</a>
+			</p>
+		</div>
+	</div>
+	<script>
+		function recalc()
+		{
+			for(var i = 1; i<ilosc; i++)
+			{
+				data[i-1]=data[i];
+			}
+			example.randomnumber(function(response){
+				//document.getElementById('message').innerHTML = response;  
+				data[i-1]=response;
+				console.log(response);
+			});
+			myp.data=data;
+			myp.plot();
+		}
+
+		function prepData(range,amount) 
+		{
+			var arr= new Array(amount);
+			for (var i=0; i<amount; i++)
+			{
+				arr[i]=Math.floor(Math.random()*range)+1;
+			}
+			return arr;
+		}
+
+		var ilosc = 200;
+
+		var myp = new MakeDraw();
+		myp.id="canv";
+
+		myp.plotColor = 'rgba(0,0,225,1)';
+		myp.gridColor = 'rgba(0,0,0,0.05)';
+		myp.fSize=15;
+		myp.enumerateP=0;
+		myp.enumerateH=0;
+		myp.enumerateV=1;
+
+		var data = prepData(10,ilosc);
+		//myp.data=data;
+		//myp.plot();
+		var t = setInterval('recalc()',20);
+</script>
+</body>
+</html>

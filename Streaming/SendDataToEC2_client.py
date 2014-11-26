@@ -1,21 +1,40 @@
 #!/usr/bin/env python
 import socket, sys
 import subprocess, shlex
+from struct import unpack
+from encode_protocol import encode_protocol
 
-# TODO: parsing one line of data from tshark
-# need to:
-# 1) encode hex data using unpack:
-# http://stackoverflow.com/questions/3531723/unpack-from-hex-to-double-in-python
-# 2) encode NULL to 0;
-# 3) encode categorial data to numbers
-def parseSample(line):
-  return line
-
-# connect as a TCP *client*
-# should ideally be a server, because Spark should be the client
-# but making this part a client is easier than letting EC2 connect
-# to a machine inside university network
+# parsing one line of data from tshark
+# 1) encode categorial data to numbers
+# 2) encode hex data using unpack:
+#    http://stackoverflow.com/questions/3531723/unpack-from-hex-to-double-in-python
+#    the fields to encode: ip.dsfield.dscp, ip.dsfield.ecn, ip.id, ip.flags, tcp.flags
+# 3) encode NULL to 0;
+def parse_sample(line):
+  fields = line.lower().split(',')
   
+  # 1) encode categorial data to numbers
+  fields[12] = str(encode_protocol(fields[12]))
+  
+  # 2) encode hex data:
+  for i in [16,17,19,20,31]:
+    if len(fields[i]) >= 8:
+      fields[i] = unpack('d', ''.join(fields[i])) 
+  
+  # 3) encode NULL to 0;
+  for i in range(len(fields)):
+    if fields[i] == "":
+      fields[i] = "0"
+  
+  # return the parsed data
+  return ','.join(fields)
+
+"""
+connect as a TCP *client*
+should ideally be a server, because Spark should be the client
+but making this part a client is easier than letting EC2 connect
+to a machine inside university network
+"""
 # hard-coded IP and port
 # need to replace it with EC2 instance parameter
 TCP_IP = '127.0.0.1'
@@ -34,7 +53,7 @@ proc.stdout.readline()
 
 # keep reading and sending
 while 1:
-  item = parseSample(proc.stdout.readline())
+  item = parse_sample(proc.stdout.readline())
   soc.send(item)
 
 soc.close()

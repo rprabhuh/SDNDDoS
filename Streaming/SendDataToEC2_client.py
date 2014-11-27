@@ -9,10 +9,10 @@ SEPARATOR = ','
 
 # parsing one line of data from tshark
 # 1) encode categorial data to numbers
-# 2) encode hex data using unpack:
-#    http://stackoverflow.com/questions/3531723/unpack-from-hex-to-double-in-python
-#    the fields to encode: ip.dsfield.dscp, ip.dsfield.ecn, ip.id, ip.flags, tcp.flags
-# 3) encode NULL to 0;
+# 2) encode hex data 
+#    the fields to encode: ip.dsfield.dscp, ip.dsfield.ecn, ip.id
+# 3) encode NULL to 0
+
 def parse_sample(line):
   fields = line.lower().split(SEPARATOR, NUM_FIELDS)
   

@@ -59,12 +59,12 @@ but making this part a client is easier than letting EC2 connect
 to a machine inside university network
 """
 # hard-coded IP and port for testing
-TCP_IP = '127.0.0.1'
-TCP_PORT = 3000
+#TCP_IP = '127.0.0.1'
+#TCP_PORT = 3000
 
 # EC2 instance socket address taken as cmd line arguments
-#TCP_IP = sys.argv[1]
-#TCP_PORT = int(sys.argv[2])
+TCP_IP = sys.argv[1]
+TCP_PORT = int(sys.argv[2])
 
 
 BUFFER_SIZE = 1024
@@ -72,7 +72,7 @@ BUFFER_SIZE = 1024
 #soc.connect((TCP_IP, TCP_PORT))
 
 # RUN tshark COMMAND
-cmd = shlex.split('sudo tshark -r AD1.pcap.gz -T fields -e frame.time_relative -e ip.id -e ip.proto -e frame.interface_id -e frame.encap_type -e frame.offset_shift -e frame.time_epoch -e frame.time_delta -e frame.len -e frame.cap_len -e frame.marked -e frame.ignored -e ip.hdr_len -e ip.dsfield -e ip.dsfield.dscp -e ip.dsfield.ecn -e ip.len -e ip.flags.rb -e ip.flags.df -e ip.flags.mf -e ip.frag_offset -e ip.ttl -e tcp.stream -e tcp.hdr_len -e tcp.flags.res -e tcp.flags.ns -e tcp.flags.cwr -e tcp.flags.ecn -e tcp.flags.urg -e tcp.flags.ack -e tcp.flags.push -e tcp.flags.reset -e tcp.flags.syn -e tcp.flags.fin -e tcp.window_size_value -e tcp.window_size -e tcp.window_size_scalefactor -e tcp.option_len -e tcp.options.timestamp.tsval -e tcp.options.timestamp.tsecr -e tcp.analysis.bytes_in_flight -e eth.lg -e eth.ig -E separator=,')
+cmd = shlex.split('sudo tshark -i vboxnet0 -T fields -e frame.time_relative -e ip.id -e ip.proto -e frame.interface_id -e frame.encap_type -e frame.offset_shift -e frame.time_epoch -e frame.time_delta -e frame.len -e frame.cap_len -e frame.marked -e frame.ignored -e ip.hdr_len -e ip.dsfield -e ip.dsfield.dscp -e ip.dsfield.ecn -e ip.len -e ip.flags.rb -e ip.flags.df -e ip.flags.mf -e ip.frag_offset -e ip.ttl -e tcp.stream -e tcp.hdr_len -e tcp.flags.res -e tcp.flags.ns -e tcp.flags.cwr -e tcp.flags.ecn -e tcp.flags.urg -e tcp.flags.ack -e tcp.flags.push -e tcp.flags.reset -e tcp.flags.syn -e tcp.flags.fin -e tcp.window_size_value -e tcp.window_size -e tcp.window_size_scalefactor -e tcp.option_len -e tcp.options.timestamp.tsval -e tcp.options.timestamp.tsecr -e tcp.analysis.bytes_in_flight -e eth.lg -e eth.ig -E separator=,')
 
 proc = subprocess.Popen(cmd, shell=False, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 # proc = subprocess.Popen(['ping', 'google.com'], shell=False, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

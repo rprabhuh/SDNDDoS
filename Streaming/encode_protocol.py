@@ -292,9 +292,9 @@ def encode_protocol(text):
   elif 'rohc' in text:
     return 142
   elif 'experiment' in text:
-    return 253
+    return 143			# 253
   elif 'test' in text:
-    return 254
+    return 144			# 254
   else:
-    return 255
+    return 145			# 255
 

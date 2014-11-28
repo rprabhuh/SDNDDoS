@@ -38,16 +38,32 @@ def parsePoint(line):
 data = sc.textFile(learning_data_file)
 
 parsedData = data.map(parsePoint)
-model = DecisionTree.trainClassifier(parsedData, numClasses=2, categoricalFeaturesInfo={0:3},
+model = DecisionTree.trainClassifier(parsedData, numClasses=2, categoricalFeaturesInfo={},
 					impurity='gini', maxDepth=30, maxBins=100)
+
+#model = DecisionTree.trainClassifier(parsedData, numClasses=2, categoricalFeaturesInfo={},impurity='gini', maxDepth=30, maxBins=100)
+f= open("output.txt", "w")
+def pred(x):
+  res = model.predict(x)
+  f.write("The prediction is:")
+  f.write("%s\n"%res.toDebugString())
+  return res
+
 
 
 # Classify the rows coming in as a stream
 lines = ssc.socketTextStream(host, port)
 
-prediction = model.predict(lines.flatMap(lambda line: line.split(" ")))
+#prediction = model.predict(lines.flatMap(lambda line: line.split(" ")))
+'''
+words = lines.flatMap(lambda x:x.split()).map(lambda x:(x,1))
+	This needs to be paired up with a reduce job
+'''
+#print prediction
 
-print prediction
+vectors = lines.flatMap(lambda x:x.split()).map(lambda l:map(float, l.split()))
+
+vectors.foreachRDD(pred)
 
 ssc.start()
 ssc.awaitTermination()

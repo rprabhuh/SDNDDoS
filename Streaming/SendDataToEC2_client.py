@@ -14,6 +14,10 @@ SEPARATOR = ','
 # 3) encode NULL to 0
 
 def parse_sample(line):
+
+  if line is None or line == "":
+	return ""
+
   fields = line.lower().split(SEPARATOR, NUM_FIELDS)
   
   # THE FIRST FIELD (frame.time_relative) CONTAINS THE UNIQUE IDENTIFIER OF EACH PACKET AS IT WILL BE UNIQUE
@@ -36,7 +40,7 @@ def parse_sample(line):
 	return ""
 
   # 1) encode categorial data to numbers: fields[2] - ip.proto
-  fields[2] = str(encode_protocol(fields[2]))
+  #fields[2] = str(encode_protocol(fields[2]))
   
   # 2) convert hex data to string:
   for i in [1,14,15]:
@@ -59,17 +63,17 @@ but making this part a client is easier than letting EC2 connect
 to a machine inside university network
 """
 # hard-coded IP and port for testing
-#TCP_IP = '127.0.0.1'
-#TCP_PORT = 3000
+TCP_IP = '54.172.245.27'
+TCP_PORT = 4000
 
 # EC2 instance socket address taken as cmd line arguments
-TCP_IP = sys.argv[1]
-TCP_PORT = int(sys.argv[2])
+#TCP_IP = sys.argv[1]
+#TCP_PORT = int(sys.argv[2])
 
 
 BUFFER_SIZE = 1024
-#soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#soc.connect((TCP_IP, TCP_PORT))
+soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+soc.connect((TCP_IP, TCP_PORT))
 
 # RUN tshark COMMAND
 cmd = shlex.split('sudo tshark -i vboxnet0 -T fields -e frame.time_relative -e ip.id -e ip.proto -e frame.interface_id -e frame.encap_type -e frame.offset_shift -e frame.time_epoch -e frame.time_delta -e frame.len -e frame.cap_len -e frame.marked -e frame.ignored -e ip.hdr_len -e ip.dsfield -e ip.dsfield.dscp -e ip.dsfield.ecn -e ip.len -e ip.flags.rb -e ip.flags.df -e ip.flags.mf -e ip.frag_offset -e ip.ttl -e tcp.stream -e tcp.hdr_len -e tcp.flags.res -e tcp.flags.ns -e tcp.flags.cwr -e tcp.flags.ecn -e tcp.flags.urg -e tcp.flags.ack -e tcp.flags.push -e tcp.flags.reset -e tcp.flags.syn -e tcp.flags.fin -e tcp.window_size_value -e tcp.window_size -e tcp.window_size_scalefactor -e tcp.option_len -e tcp.options.timestamp.tsval -e tcp.options.timestamp.tsecr -e tcp.analysis.bytes_in_flight -e eth.lg -e eth.ig -E separator=,')
@@ -78,7 +82,7 @@ proc = subprocess.Popen(cmd, shell=False, stdin=subprocess.PIPE, stdout=subproce
 # proc = subprocess.Popen(['ping', 'google.com'], shell=False, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 # skip the first line, it is not data
-#proc.stdout.readline()
+proc.stdout.readline()
 
 # keep reading and sending
 f = open("test.txt", "w")
@@ -90,7 +94,7 @@ while 1:
   f.write(item)
   
   # item CONTAINS THE PACKET INFO TO BE SENT TO EC2 WHEREIN THE 1ST FIELD CONTAINS THE ip.id FIELD THAT UNIQUELY IDENTIFIES THIS PACKET
-  #soc.send(item)
+  soc.send(item)
 
 soc.close()
 

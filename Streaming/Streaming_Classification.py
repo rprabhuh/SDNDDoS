@@ -5,8 +5,8 @@ from pyspark.mllib.tree import DecisionTree
 from pyspark.mllib.regression import LabeledPoint
 from numpy import array
 
-port = 3000
-host = 'localhost'
+port = 6633
+host = '10.136.122.114'
 learning_data_file = './Streaming_Classification_small.txt'
 appName = "DDE"
 conf = SparkConf().setAppName(appName).setMaster("local")

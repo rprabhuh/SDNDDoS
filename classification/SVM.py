@@ -3,8 +3,9 @@ from pyspark.mllib.regression import LabeledPoint
 from numpy import array
 from pyspark import SparkContext, SparkConf
 import sys
+import timeit
 
-appName = "KDDDataset"
+appName = "DDE"
 
 # Setup Spark configuration
 conf = SparkConf().setAppName(appName).setMaster("local")
@@ -28,6 +29,7 @@ def parsePoint(line):
 if(len(sys.argv)==1):
 	print("Please pass the filename of the dataset as a commandline argument")
 	exit(0);
+start = timeit.timeit()
 
 # Read the input data file
 data = sc.textFile("../Data/"+sys.argv[1])
@@ -38,8 +40,18 @@ parsedData = data.map(parsePoint)
 # Build the classification model
 model = SVMWithSGD.train(parsedData)
 
+end = timeit.timeit()
+
+print "Training Time = " +str(end - start)
+
+start = timeit.timeit()
+
 # Evaluating the model on training data
 labelsAndPreds = parsedData.map(lambda p: (p.label, model.predict(p.features)))
 trainErr = labelsAndPreds.filter(lambda (v, p): v != p).count() / float(parsedData.count())
+
+end = timeit.timeit()
+
 print("Training Error = " + str(trainErr))
-print(model)
+
+print "Testing Time = " + str(end - start)

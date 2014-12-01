@@ -3,7 +3,7 @@ from pyspark.mllib.regression import LabeledPoint
 from numpy import array
 from pyspark import SparkContext, SparkConf
 import sys
-
+import timeit
 appName = "KDDDataset"
 
 # Setup Spark configuration
@@ -20,50 +20,53 @@ Expects:
 	- The attributes in the row should be comma separated
 	- The first column should be the class label
 '''
+
 def parsePoint(line):
     values = [float(x) for x in line.split(',')]
     return LabeledPoint(values[0], values[1:])
 
 #Check if the dataset has been passed as an argument
 if(len(sys.argv)==1):
-	print("Please pass the filename of the dataset as a commandline argument")
+	print("Please pass the filename of the Train and Test datasets as commandline arguments")
 	exit(0);
 
 # Read the input data file
-data = sc.textFile("../Data/"+sys.argv[1])
-
+Traindata = sc.textFile("../Data/"+sys.argv[1])
+Testdata = sc.textFile("../Data/"+sys.argv[2])
 # Parse the data to construct a classification dataset
-parsedData = data.map(parsePoint)
 
-#Indicate the categorical attributes
-#categorical_attributes = {2:2,3:3,4:3}
+parsedData = Traindata.map(parsePoint)
+parsedTestData = Testdata.map(parsePoint)
+
+
 # Build the classification model
 '''
 impurity can be any of {gini, entropy, variance}
 categoricalFeaturesInfo contains information pertaining to categorical features in the dataset
 '''
-model = DecisionTree.trainClassifier(parsedData, numClasses=2, categoricalFeaturesInfo={0:3},
-                                     impurity='gini', maxDepth=30, maxBins=100)
+start = timeit.timeit()
+model = DecisionTree.trainClassifier(parsedData, numClasses=2, categoricalFeaturesInfo={},
+                                     impurity='gini', maxDepth=30, maxBins=1000)
+end = timeit.timeit()
 
-# PRINT THE MODEL
-#print('Learned decision tree model:')
-#print(model.toDebugString())
+print "Time to Train = " + str(end-start)
 
-# Evaluating the model on training data
-#sys.stdout.write(model)
-
-# Working: Predict with a single input
-#predictions = model.predict(array([2,1032,0,0,0,0,0,0,0,0,0,255,255,1,0,1,0,0,0]))
+print model.toDebugString()
 
 # BATCH PREDICTION
-predictions = model.predict(parsedData.map(lambda x: x.features))
-labelsAndPredictions = parsedData.map(lambda lp: lp.label).zip(predictions)
+start = timeit.timeit()
+
+predictions = model.predict(parsedTestData.map(lambda x: x.features))
+labelsAndPredictions = parsedTestData.map(lambda lp: lp.label).zip(predictions)
 
 # Dsiplay Training Mean Squared Error
-trainMSE = labelsAndPredictions.map(lambda (v, p): (v - p) * (v - p)).sum() / float(parsedData.count())
+trainMSE = labelsAndPredictions.map(lambda (v, p): (v - p) * (v - p)).sum() / float(parsedTestData.count())
 print('Training Mean Squared Error = ' + str(trainMSE))
 
 # Dsiplay Training Error
-trainErr = labelsAndPredictions.filter(lambda (v, p): v != p).count() / float(parsedData.count())
-print('Training Error = ' + str(trainErr))
+trainErr = labelsAndPredictions.filter(lambda (v, p): v != p).count() / float(parsedTestData.count())
 
+end = timeit.timeit()
+
+print('Training Error = ' + str(trainErr))
+print "Time to test = " + str(end-start)

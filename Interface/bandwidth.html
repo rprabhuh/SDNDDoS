@@ -2,14 +2,14 @@
 <html>
 <head>
 
-<!-- your webpage info goes here -->
 
-    <title>SDN Analytics to Counter DDoS Attacks</title>
+
+    <title>SDN Enabled Big Data Analytics for DDoS Resistant Networks</title>
 	
-	<meta name="author" content="your name" />
+	<meta name="author" content="Cloud 9" />
 	<meta name="description" content="" />
 
-<!-- you should always add your stylesheet (css) in the head tag so that it starts loading before the page html is being displayed -->	
+
 	<link rel="stylesheet" href="style.css" type="text/css" />
 	
 </head>
@@ -17,20 +17,14 @@
 	<script src="plot.js"></script>
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<script src="/pico/client.js"></script>
-    <script>pico.load("bandwidth");</script>
-<!-- webpage content goes here in the body -->
+    <script>pico.load("plotscript");</script>
+
 
 	<div id="page">
 		<div id="logo">
-			<h1><a href="/">SDN Analytics to Counter DDoS Attacks</a></h1>
+			<h1>SDN Enabled Big Data Analytics for DDoS Resistant Networks</h1>
 		</div>
-		<div id="nav">
-			<ul>
-				<li class="red"><a href="#/home.html">Home</a></li>
-				<li class="orange"><a href="#/about.html">About</a></li>
-				<li class="yellow"><a href="#/contact.html">Contact</a></li>
-			</ul>	
-		</div>
+		
 		<div id="content">
 			<h2>Abstract</h2>
 			<p>
@@ -55,7 +49,7 @@
 			{
 				data[i-1]=data[i];
 			}
-			bandwidth.rx(function(response){
+			example.randomnumber(function(response){
 				//document.getElementById('message').innerHTML = response;  
 				data[i-1]=response;
 				console.log(response);

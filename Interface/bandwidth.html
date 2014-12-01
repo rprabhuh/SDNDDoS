@@ -17,7 +17,7 @@
 	<script src="plot.js"></script>
 	<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<script src="/pico/client.js"></script>
-    <script>pico.load("plotscript");</script>
+    <script>pico.load("bandwidth");</script>
 
 
 	<div id="page">
@@ -49,7 +49,7 @@
 			{
 				data[i-1]=data[i];
 			}
-			example.randomnumber(function(response){
+			bandwidth.rx(function(response){
 				//document.getElementById('message').innerHTML = response;  
 				data[i-1]=response;
 				console.log(response);

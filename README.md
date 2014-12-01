@@ -45,3 +45,6 @@ Streaming
 - .py Files : Files contaning python code to send data to EC2 from the controller and receive data from the DDE at the controller
 - encode_protocol.py : Encoding for all the protocols used for network packet transmission
 - IP_Protocols.csv : All the protocols used for network packet transmission, in use today
+- .txt, .dat files : Training data
+- DEMO.txt : Readme file for running the demo
+

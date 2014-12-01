@@ -1,0 +1,64 @@
+Dependencies:
+  mininet, numpy, Apache-Spark, hping, hulk.py, pico
+  
+  We only simulated the demo on Ubuntu 14.04 and Python-2.7.
+  
+  mininet: please see
+    http://mininet.org/download/#option-2-native-installation-from-source
+   
+  numpy:
+    $ pip install numpy
+
+  Apache-Spark:
+    Streaming support in Python is only recently added, so compiling from source
+    is necessary. Please see https://github.com/apache/spark for details:
+    $ git clone https://github.com/apache/spark && cd spark
+    $ mvn -DskipTests clean package
+  
+  hping:
+    Simulating TCP SYN attack:
+    $ sudo apt-get install hping3
+
+  hulk.py:
+    hulk.py is another tool to simulate TCP SYN attack:
+    http://www.sectorix.com/2012/05/17/hulk-web-server-dos-tool/
+
+  to display network bandwidth on an network interface, we need to install pico:
+    $ pip install pico
+  also plot.js is required to display the chart. Please download at
+  http://mathmed.blox.pl/2012/01/Biblioteka-JavaScript-do-rysowania-wykresow.html
+
+Running the demo:
+  for this demo, we listen to wlan0 interface of the machine. To listen to another
+  interface, please modify line 87 of Streaming/Send_Samples.py and line 6 of 
+  Interface/bandwidth.py.
+
+  get the repo:
+  $ git clone https://github.com/rprabhuh/SDNDDoS
+  
+  run the sending server, this script will set up a mininet and collect data samples:
+  $ cd Streaming && sudo Send_Samples.py
+  
+  run the receiving server, this script will get results from Spark and cut mininet
+  flows if necessary:
+  $ sudo Recv_React.py
+
+  in another terminal, run the Spark classification task and connect to two servers:
+  $ $SPARK_HOME/bin/spark-submit Classify_Response.py
+  
+  please replace $SPARK_HOME with the actual Spark path in your system, or set up 
+  the environment variable to point to the Spark path
+  
+  Start SYN flooding attack:
+    $ sudo hping3 -i u1 -S -p 80 127.0.0.1
+  
+  by now, you should see Spark trains a classification using the offline data we 
+  prepared, and constantly classifies incoming data samples. If malicious data is found,
+  the flow table will be modified in receiving server's window.
+
+  to see the real time bandwidth flow, start a pico server in SDNDDoS/Interface folder:
+  $ python -m pico.server
+  then visit 
+  http://localhost:8800/bandwidth.html
+  in a web browser.
+  

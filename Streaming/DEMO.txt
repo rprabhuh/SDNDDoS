@@ -33,13 +33,20 @@ Dependencies:
 
 Running the demo:
   for this demo, we listen to wlan0 interface of the machine. To listen
-  to another interface, please modify line 68 of Streaming/Send_Samples.py
+  to another interface, please modify line 72 of Streaming/Send_Samples.py
   and line 6 of Interface/bandwidth.py.
 
   get the repo:
   $ git clone https://github.com/rprabhuh/SDNDDoS
   $ cd SDNDDoS/Streaming
-
+  
+  set up SPARK_HOME environment variable:
+  $ export SPARK_HOME=/your/spark/home/folder
+  
+  then run everything by
+  $ ./run_all.sh
+  
+  Alternatively, you can run each part manually:
   first, set up the mininet network:
   $ sudo ./Setup_Net.py
   a network with three hosts h0, h1 and h2 is setup, and they can see 
@@ -47,11 +54,11 @@ Running the demo:
 
   in another terminal window, run the sending server, this script will 
   set up a mininet and collect data samples from a network interface:
-  $ sudo Send_Samples.py
+  $ sudo ./Send_Samples.py
 
   in another terminal window, run the receiving server, this script will
   get results from Spark and cut off flows if necessary:
-  $ sudo Recv_React.py
+  $ sudo ./Recv_React.py
 
   in another terminal, run the Spark classification task and connect to 
   two servers:
@@ -63,6 +70,9 @@ Running the demo:
   Start SYN flooding attack:
     $ sudo hping3 --rand-source {YourIP} -c 50 -i u10000 -S -L 0 -p 80
   where {YourIP} is the IP address Send_Samples.py is listening to.
+  
+  there is also another script that issues the previous command periodically.
+  $ sudo ./emu_SYN.py
   
   by now, you should see Spark trains a classification using the offline
   data we prepared, and constantly classifies incoming data samples. If 

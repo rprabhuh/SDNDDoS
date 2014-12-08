@@ -4,6 +4,7 @@ from mininet.topo import Topo
 from mininet.node import OVSController
 from mininet.cli import CLI
 from subprocess import call
+from time import sleep
 
 print 'Clean up and set up a network:'
 call("sudo service openvswitch-controller stop", shell=True)
@@ -22,7 +23,10 @@ net.start()
 
 print("Flow Rule Added")
 call('ovs-ofctl add-flow s1 priority=10,action=normal', shell=True)
-net.pingAll()
+
+while 1:
+  net.ping([h0,h1,h2],1)  # timeout = 1 seconds
+  sleep(2)
 
 """
 #To stop the flow from host 0  with ip 10.0.0.1
@@ -36,5 +40,5 @@ call( 'ovs-ofctl --strict del-flows s1 priority=11,dl_type=0x0800,nw_src=10.0.0.
 net.pingAll()
 """
 
-CLI(net)
+#CLI(net)
 net.stop()

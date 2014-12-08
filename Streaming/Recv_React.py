@@ -1,11 +1,19 @@
 #!/usr/bin/env python
 import socket, sys, simplejson
 import subprocess, shlex
+import time, threading
 
 FLOW_BLOCKED = False
+BLOCK_TIME = 10 # block the traffic for 10 seconds
+H0 = "10.0.0.1"
+
+# hard-coded IP and port for testing
+TCP_IP = '127.0.0.1'
+ANS_PORT = 3006
+BUFFER_SIZE = 256
 
 def find_host_from_pktid(pkt_id):
-  return "10.0.0.1"
+  return H0
 
 def block_host(host):
   global FLOW_BLOCKED
@@ -19,8 +27,9 @@ def block_host(host):
     print("=============== Flows after blocking: ===============")
     subprocess.call('ovs-ofctl dump-flows s1', shell=True)
 
-    print("=====================================================")
     FLOW_BLOCKED = True
+  else:
+    print str(host) + " currently blocked"
 
 def restore_host(host):
   global FLOW_BLOCKED
@@ -33,11 +42,8 @@ def restore_host(host):
 
     print("=============== Flows after restoring: ===============")
     subprocess.call('ovs-ofctl dump-flows s1', shell=True)
-
-# hard-coded IP and port for testing
-TCP_IP = '127.0.0.1'
-ANS_PORT = 3006
-BUFFER_SIZE = 256
+    
+    FLOW_BLOCKED = False
 
 soc_recv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # to handle Python [Errno 98] Address already in use
@@ -50,6 +56,7 @@ print 'Connection address:', addr
 
 while 1:
   data = conn.recv(BUFFER_SIZE)
+  print("======================================================")
   result = simplejson.loads(data)
   print result
   """ result looks something like this:
@@ -58,6 +65,9 @@ while 1:
   if not result["allow"]:
     host_to_block = find_host_from_pktid(result["pkt_id"])
     block_host(host_to_block)
+    
+    # try restoring again after BLOCK_TIME seconds
+    threading.Timer(BLOCK_TIME, restore_host, [H0]).start()
   else:
     print "normal traffic"
 

@@ -4,8 +4,12 @@ import subprocess, shlex
 #from struct import unpack
 #from encode_protocol import encode_protocol
 
-# function of parsing captured raw data
-# parsing one line of data from tshark
+TCP_IP = '127.0.0.1'
+TCP_PORT = 3000
+BUFFER_SIZE = 1024
+
+#### function of parsing captured raw data
+#### parsing one line of data from tshark
 # 1) encode categorial data to numbers
 # 2) encode hex data
 #    the fields to encode: ip.dsfield.dscp, ip.dsfield.ecn, ip.id
@@ -75,10 +79,6 @@ proc = subprocess.Popen(shlex.split(cmd), shell=False, stdin=subprocess.PIPE, st
 proc.stdout.readline()
 
 print 'Setting up connection to Spark:'
-TCP_IP = '127.0.0.1'
-TCP_PORT = 3000
-BUFFER_SIZE = 1024
-
 soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # to handle Python [Errno 98] Address already in use
 soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
